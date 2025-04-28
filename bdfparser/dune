@@ -9,4 +9,6 @@
 
 (library
  (public_name bdfparser)
- (name bdfparser))
+ (name bdfparser)
+ (preprocess (pps ppx_sexp_conv))
+ )

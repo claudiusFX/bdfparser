@@ -1,3 +1,5 @@
-(test
+(library
  (name test_bdfparser)
- (libraries bdfparser ounit2))
+ (preprocess (pps ppx_expect ppx_sexp_value ppx_sexp_conv))
+ (inline_tests)
+ (libraries bdfparser expect_test_helpers_core))
