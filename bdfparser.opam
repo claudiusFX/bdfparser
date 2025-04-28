@@ -7,12 +7,14 @@ authors: ["Michael Dales <michael@digitalflapjack.com>"]
 license: "ICS"
 tags: ["font" "rendering" "bitmap"]
 homepage: "https://github.com/mdales/bdfparser"
-doc: "https://url/to/documentation"
 bug-reports: "https://github.com/mdales/bdfparser/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.14"}
   "menhir"
+  "ppx_sexp_conv"
+  "expect_test_helpers_core" {with-test}
+  "ppx_expect" {with-test}
   "odoc" {with-doc}
 ]
 build: [
