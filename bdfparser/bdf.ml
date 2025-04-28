@@ -85,8 +85,7 @@ type t = {
   content_version : int ;
   metric_set : int ;
   properties : (string * Innertypes.property_val) list;
-  glyphs : Glyph.t array;
-  map: int Uchar_map.t;
+  glyphs : Glyph.t Uchar_map.t;
 }
 
 let default_t = {
@@ -97,8 +96,7 @@ let default_t = {
   content_version = 0 ;
   metric_set = 0 ;
   properties = [] ;
-  glyphs = [||] ;
-  map = Uchar_map.empty;
+  glyphs = Uchar_map.empty;
 }
 
 
@@ -113,33 +111,25 @@ let create (filename : string) : (t, string) result =
   | None -> (Error "No file")
   | Some ast -> (
     Ok (
-      let fnt = List.fold_left (fun (acc : t) (item : Innertypes.header) : t ->
-        match item with
-        | `Version v -> { acc with version=v }
-        | `Size s -> { acc with size=s }
-        | `FontName n -> { acc with name=n }
-        | `BoundingBox b -> { acc with bounding_box=b }
-        | `Comment _ -> acc
-        | `Chars _ -> acc
-        | `MetricSet s -> { acc with metric_set=s }
-        | `ContentVersion c -> { acc with content_version=c }
-        | `Properties p -> { acc with properties=(List.concat [acc.properties ; p]) }
-        | `Char c -> (
-          let g = Glyph.innerchar_to_glyph c in
-          { acc with glyphs=(Array.of_list (g :: (Array.to_list acc.glyphs)))}
-        )
-        | `Noop -> acc
+      List.fold_left (fun (acc : t) (item : Innertypes.header) : t ->
+          match item with
+          | `Version v -> { acc with version=v }
+          | `Size s -> { acc with size=s }
+          | `FontName n -> { acc with name=n }
+          | `BoundingBox b -> { acc with bounding_box=b }
+          | `Comment _ -> acc
+          | `Chars _ -> acc
+          | `MetricSet s -> { acc with metric_set=s }
+          | `ContentVersion c -> { acc with content_version=c }
+          | `Properties p -> { acc with properties=(List.concat [acc.properties ; p]) }
+          | `Char c -> (
+              let g = Glyph.innerchar_to_glyph c in
+              { acc with
+                glyphs = Uchar_map.add (Uchar.of_int (Glyph.encoding g)) g acc.glyphs
+              }
+            )
+          | `Noop -> acc
         ) default_t ast
-      in
-      (* having built it, now work out the lookup map *)
-      let _, map =
-        Array.fold_left
-          (fun (i, acc ) g ->
-             let u = Uchar.of_int (Glyph.encoding g) in
-             (i + 1, Uchar_map.add u i acc)
-          ) (0, Uchar_map.empty) fnt.glyphs
-      in
-      { fnt with map }
     )
   )
 
@@ -153,13 +143,7 @@ let version t =
   t.content_version
 
 let glyph_count t =
-  Array.length t.glyphs
+  Uchar_map.cardinal t.glyphs
 
 let glyph_of_char (font : t) (u : Uchar.t) : Glyph.t option =
-  match (Uchar_map.find_opt u font.map) with
-  | None -> None
-  | Some index -> (
-    match ((index >= 0) && (index < Array.length font.glyphs)) with
-    | false -> None
-    | true -> Some font.glyphs.(index)
-  )
+  Uchar_map.find_opt u font.glyphs
