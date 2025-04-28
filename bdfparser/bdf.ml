@@ -1,4 +1,6 @@
 
+module Uchar_map = Map.Make(Uchar)
+
 module Glyph = struct
   type t = {
     name : string;
@@ -84,7 +86,7 @@ type t = {
   metric_set : int ;
   properties : (string * Innertypes.property_val) list;
   glyphs : Glyph.t array;
-  map: (Uchar.t * int) list;
+  map: int Uchar_map.t;
 }
 
 let default_t = {
@@ -96,7 +98,7 @@ let default_t = {
   metric_set = 0 ;
   properties = [] ;
   glyphs = [||] ;
-  map = [] ;
+  map = Uchar_map.empty;
 }
 
 
@@ -130,8 +132,14 @@ let create (filename : string) : (t, string) result =
         ) default_t ast
       in
       (* having built it, now work out the lookup map *)
-      let map = Array.mapi (fun i g -> (Uchar.of_int (Glyph.encoding g), i)) fnt.glyphs in
-      { fnt with map=(Array.to_list map) }
+      let _, map =
+        Array.fold_left
+          (fun (i, acc ) g ->
+             let u = Uchar.of_int (Glyph.encoding g) in
+             (i + 1, Uchar_map.add u i acc)
+          ) (0, Uchar_map.empty) fnt.glyphs
+      in
+      { fnt with map }
     )
   )
 
@@ -148,7 +156,7 @@ let glyph_count t =
   Array.length t.glyphs
 
 let glyph_of_char (font : t) (u : Uchar.t) : Glyph.t option =
-  match (List.assoc_opt u font.map) with
+  match (Uchar_map.find_opt u font.map) with
   | None -> None
   | Some index -> (
     match ((index >= 0) && (index < Array.length font.glyphs)) with
