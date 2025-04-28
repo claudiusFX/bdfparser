@@ -1,9 +1,9 @@
 (** A library that reads {{:https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format}BDF bitmap font files} and will return per glyph bitmaps. *)
 
-type t
+type t [@@deriving sexp]
 
 module Glyph : sig
-    type t
+    type t [@@deriving sexp]
 
     val name: t -> string
     (** [name glyph] Returns the name in the font file of the specified glyph. *)
