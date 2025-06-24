@@ -18,7 +18,7 @@
 (package
   (name        bdfparser)
   (synopsis    "Library to parse BDF font files.")
-  (description "A longer description")
+  (description "Library to parse BDF font files.")
   (depends
    ocaml
    dune
