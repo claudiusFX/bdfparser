@@ -24,6 +24,5 @@
    dune
    menhir
    ppx_sexp_conv
-   (expect_test_helpers_core :with-test)
-   (ppx_expect               :with-test))
+   (ounit :with-test))
   (tags (font rendering bitmap)))
