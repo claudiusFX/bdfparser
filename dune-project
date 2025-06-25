@@ -15,12 +15,13 @@
 
 (license ICS)
 
-(documentation https://url/to/documentation)
-
 (package
- (name bdfparser)
- (synopsis "Library to parse BDF font files.")
- (description "A longer description")
- (depends ocaml dune menhir)
- (tags
-  (font rendering bitmap)))
+  (name        bdfparser)
+  (synopsis    "Library to parse BDF font files.")
+  (description "Library to parse BDF font files.")
+  (depends
+   ocaml
+   dune
+   menhir
+   (ounit :with-test))
+  (tags (font rendering bitmap)))
