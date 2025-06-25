@@ -23,6 +23,5 @@
    ocaml
    dune
    menhir
-   ppx_sexp_conv
    (ounit :with-test))
   (tags (font rendering bitmap)))

@@ -1,28 +1,4 @@
-open Sexplib0.Sexp_conv
-
-module Uchar = struct
-  include Uchar
-
-  let sexp_of_t t =
-    Uchar.to_int t
-    |> [%sexp_of: int]
-
-  let t_of_sexp s =
-    [%of_sexp: int] s
-    |> Uchar.of_int
-end
-
-module Uchar_map = struct
-  include Map.Make(Uchar)
-
-  let sexp_of_t sexp_of_v t =
-    to_list t
-    |> [%sexp_of: (Uchar.t * v) list]
-
-  let t_of_sexp v_of_sexp s =
-    [%of_sexp: (Uchar.t * v) list] s
-    |> of_list
-end
+module Uchar_map = Map.Make(Uchar)
 
 module Glyph = struct
   type t = {
@@ -35,7 +11,7 @@ module Glyph = struct
     vvector : int * int ;
     bounding_box : int * int * int * int ;
     bitmap : bytes;
-  } [@@deriving sexp]
+  }
 
   let name g  =
     g.name
@@ -109,7 +85,7 @@ type t = {
   metric_set : int ;
   properties : (string * Innertypes.property_val) list;
   glyphs : Glyph.t Uchar_map.t;
-} [@@deriving sexp]
+}
 
 let default_t = {
   version = 0. ;
